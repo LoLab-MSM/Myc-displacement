@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from pysb.bng import run_ssa
 from pysb.integrate import odesolve
 
-Model()
+Model() 
 
 #Binding domain names are taken from the summary model found in the 
 #Dias, Nguyen, Georgiev et al., 2014 article
