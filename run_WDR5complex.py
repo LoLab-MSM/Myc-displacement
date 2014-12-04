@@ -12,32 +12,13 @@ from pysb.integrate import odesolve
 import numpy as np
 import re
 t=linspace(0,1,50)
-plt.figure()
-
-#x=odesolve(model,t,verbose=True)
-#for obs in model.observables:
-#    plt.plot(t,x[str(obs)], label=str(obs) + '_ode')
 
 
-#plt.savefig('WDR5_equalMycRbBP5KANSL2.png')
-#plt.show()
 colors = ('r','k','b','g','0.5')
-for i in range(100):
-    print i
-    x=run_ssa(model,t,verbose=False)
-    for j in range(len(model.observables)):
-        obs = model.observables[j]
-        if i == 0:
-            plt.plot(t,x[str(obs)],color=colors[j], label=str(obs))
-        else:    
-            plt.plot(t,x[str(obs)],color=colors[j])
-   
-plt.legend(loc=0)
-#plt.savefig('WDR5_equalMycRbBP5KANSL2.png')
- 
+points = linspace(0.01,1,100) 
 ref = np.array([p.value for p in model.parameters])
-for i in linspace(0.01,1,100):
-    print i
+
+for i in points:  
     for j in range(len(model.parameters)):
         if re.search('_0$', model.parameters[j].name):
             model.parameters[j].value *= i
@@ -45,16 +26,38 @@ for i in linspace(0.01,1,100):
     for j in range(len(model.observables)):
         obs = model.observables[j]
         plt.figure(str(obs))
-        #plt.yscale('log')
         plt.legend(loc=0)
-        if i == 0.1:
-            plt.plot(t,x[str(obs)]/i,color=colors[j], label=str(obs))
-            print x[str(obs)]
+        if i == 0.01:
+            plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j], label=str(obs))
         else:    
-            plt.plot(t,x[str(obs)]/i,color=colors[j])
+            plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j])
     for j in range(len(model.parameters)):
         model.parameters[j].value = ref[j]
+n_conc = np.zeros((len(model.observables),np.shape(points)[0]))
+counter = 0
+for i in points:
+    for j in range(len(model.parameters)):
+        if re.search('_0$', model.parameters[j].name):
+            model.parameters[j].value *= i
+    x=odesolve(model,t,verbose=False)
+    for j in range(len(model.observables)):
+        obs = model.observables[j]
+        plt.figure(str(obs))
+        plt.legend(loc=0)
+        plt.title(str(model.observables[j].name))
+        n_conc[j,counter] = x[str(obs)][-1]#/np.max(x[str(obs)])
+        if i == 0.01:
+            plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j], label=str(obs))
+            print x[str(obs)]
+        else:    
+            plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j])
+    for j in range(len(model.parameters)):
+        model.parameters[j].value = ref[j]
+    counter +=1
 
 
-    
-plt.show()   
+for j in range(len(model.observables)):
+    plt.title(str(model.observables[j].name))
+    for i in range(len(points)):
+        plt.plot(points[i], n_conc[j,i], '.',color=colors[j])
+    plt.show()
