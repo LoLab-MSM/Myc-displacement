@@ -28,9 +28,9 @@ for i in points:
         plt.figure(str(obs))
         plt.legend(loc=0)
         if i == 0.01:
-            plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j], label=str(obs))
+            fig = plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j], label=str(obs))
         else:    
-            plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j])
+            fig = plt.plot(t,x[str(obs)]/np.max(x[str(obs)]),color=colors[j])
     for j in range(len(model.parameters)):
         model.parameters[j].value = ref[j]
 n_conc = np.zeros((len(model.observables),np.shape(points)[0]))
@@ -54,6 +54,10 @@ for i in points:
     for j in range(len(model.parameters)):
         model.parameters[j].value = ref[j]
     counter +=1
+fig = plt.figure()
+ax1 = fig.add_subplot(5,2,1)
+ax2 = fig.add_subplot(5,2,2)
+ax3 = fig.add_subplot(5,2,3)
 
 
 for j in range(len(model.observables)):
